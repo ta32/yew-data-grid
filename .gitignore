@@ -13,3 +13,4 @@ yew-data-grid-derive/.idea
 .idea
 examples/data-grid-demo/target
 examples/data-grid-demo/dist
+dist

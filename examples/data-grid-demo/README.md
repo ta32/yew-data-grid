@@ -5,4 +5,4 @@
 ### Run
 
 ```bash 
-trunk serve --open
+trunk serve --open --watch ../../

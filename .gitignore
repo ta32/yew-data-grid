@@ -11,3 +11,5 @@ Cargo.lock
 yew-data-grid-derive/target
 yew-data-grid-derive/.idea
 .idea
+examples/data-grid-demo/target
+examples/data-grid-demo/dist

@@ -1,10 +1,15 @@
 # Yew-data-grid
+An ergonomic strongly typed data grid for Yew.
 
-### Pre-requisites
+## Features
 
-[install trunk and wasm32 target for rust](https://yew.rs/docs/tutorial#setting-up)
+## Examples
 
-### Run Demo
+### Derive API
 
-```bash 
-trunk serve --open
+### Implement traits manually
+
+## Demos
+
+### [Data grid demo](./examples/data-grid-demo/README.md)
+

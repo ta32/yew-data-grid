@@ -24,7 +24,6 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
     )
 }
 
-
 pub trait GridDataColumn {
     type RowType;
     fn get_value(&self, row: &Self::RowType) -> String;

@@ -39,8 +39,13 @@ fn app() -> Html {
     let rows: Vec<Task> = vec![Task{ id: 1, name: "task 1".to_string(), description: "task 1 description".to_string() },
                                Task{ id: 2, name: "task 2".to_string(), description: "task 2 description".to_string() }];
     let columns: Vec<TaskFields> = vec![TaskFields::Id, TaskFields::Name, TaskFields::Description];
+    let height = 400;
+    let style = format!("width: 100%; height: {height}px;");
     html! (
-        <DataGrid<Task, TaskFields> rows={rows} columns={columns} page_size={5}/>
+        // https://yew.rs/docs/next/concepts/basic-web-technologies/css#inline-styles
+        <div style={style}>
+            <DataGrid<Task, TaskFields> rows={rows} columns={columns} page_size={5}/>
+        </div>
     )
 }
 

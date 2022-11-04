@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
-#[function_component(DataRow)]
-pub fn data_row() -> Html {
+#[function_component(GridRow)]
+pub fn grid_row() -> Html {
     html! (
         <div>
             <p>{ "data row" }</p>

@@ -12,7 +12,6 @@ pub struct Props<T: GridData<ColumnType=U> + PartialEq, U: GridDataColumn<RowTyp
 pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                  U: GridDataColumn<RowType=T> + PartialEq + Copy>
                 (props: &Props<T, U>) -> Html {
-    // let c = rows.iter().map(|r| cols.iter().map(move |c| (r, c))).flatten();
     let grid: Html = props.rows.iter().map(|row| props.columns.iter().map(move |col| (row, col))).flatten().map(|(row, col)| {
         let value = col.get_value(row);
         html! {
@@ -47,7 +46,6 @@ pub trait GridData {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn example_cross_product() {

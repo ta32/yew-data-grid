@@ -1,0 +1,22 @@
+.yew-data-grid-container {
+    Display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.yew-data-grid-cell {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: 1px solid rgba(225, 225, 225, 1);
+    padding: 0 10px;
+
+}
+
+.yew-data-grid-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+}

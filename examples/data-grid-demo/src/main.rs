@@ -1,5 +1,5 @@
 use yew::prelude::*;
-use yew_data_grid::data_grid::{GridData, GridDataColumn, DataGrid};
+use yew_data_grid::data_grid::{GridData, GridDataColumn, DataGrid, GridDataColumnProps};
 
 // row data type
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -23,6 +23,28 @@ impl GridDataColumn for TaskFields {
             TaskFields::Id => row.id.to_string(),
             TaskFields::Name => row.name.to_string(),
             TaskFields::Description => row.description.to_string(),
+        }
+    }
+    fn get_config(&self) -> GridDataColumnProps {
+        match self {
+            TaskFields::Id => GridDataColumnProps {
+                header_name: "Id".to_string(),
+                width: 150,
+                editable: false,
+                sortable: true
+            },
+            TaskFields::Name => GridDataColumnProps {
+                header_name: "Task Name".to_string(),
+                width: 150,
+                editable: true,
+                sortable: true
+            },
+            TaskFields::Description => GridDataColumnProps {
+                header_name: "Description Testing".to_string(),
+                width: 150,
+                editable: true,
+                sortable: true
+            },
         }
     }
 }

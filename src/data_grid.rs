@@ -13,6 +13,15 @@ const DATA_GRID_STYLE: &'static str = include_str!("data_grid.rs.css");
 pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                  U: GridDataColumn<RowType=T> + PartialEq + Copy>
                 (props: &Props<T, U>) -> Html {
+    let columns = props.columns.iter().map(|column| {
+        let config = column.get_config();
+        let header_name = config.header_name;
+        let width = config.width;
+        let style = format!("width: {width}px");
+        html! {
+            <div class="yew-data-grid-header-cell" style={style}>{header_name}</div>
+        }
+    }).collect::<Html>();
     let grid = props.rows.iter().enumerate().map(|(i, row)| {
         let row_index_str = i.to_string();
         // row elements
@@ -37,14 +46,24 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         <div class="yew-data-grid-container">
             <style>{DATA_GRID_STYLE}</style>
             <h1>{ "data grid" }</h1>
+            <div class="yew-data-grid-header-row">
+                {columns}
+            </div>
             {grid}
         </div>
     )
 }
 
+pub struct GridDataColumnProps {
+    pub header_name: String,
+    pub width: i32,
+    pub editable: bool,
+    pub sortable: bool
+}
 
 pub trait GridDataColumn {
     type RowType;
+    fn get_config(&self) -> GridDataColumnProps;
     fn get_value(&self, row: &Self::RowType) -> String;
     fn get_field(&self) -> Self
         where Self: Sized + Copy

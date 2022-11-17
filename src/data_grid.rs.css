@@ -24,7 +24,6 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    background-color: rgba(225, 225, 225, 1);
 }
 
 .yew-data-grid-header-cell {
@@ -34,4 +33,14 @@
     border-bottom: 1px solid rgba(225, 225, 225, 1);
     padding: 0 10px;
     font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.yew-data-grid-header-cell::before {
+    position: relative;
+    right: 10px;
+    content: "";
+    width: 1px;
+    height: 1.5em;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
 }

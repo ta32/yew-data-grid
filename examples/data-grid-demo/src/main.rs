@@ -29,7 +29,7 @@ impl GridDataColumn for TaskFields {
         match self {
             TaskFields::Id => GridDataColumnProps {
                 header_name: "Id".to_string(),
-                width: 150,
+                width: 50,
                 editable: false,
                 sortable: true
             },
@@ -41,7 +41,7 @@ impl GridDataColumn for TaskFields {
             },
             TaskFields::Description => GridDataColumnProps {
                 header_name: "Description Testing".to_string(),
-                width: 150,
+                width: 200,
                 editable: true,
                 sortable: true
             },

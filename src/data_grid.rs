@@ -13,6 +13,10 @@ const DATA_GRID_STYLE: &'static str = include_str!("data_grid.rs.css");
 pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                  U: GridDataColumn<RowType=T> + PartialEq + Copy>
                 (props: &Props<T, U>) -> Html {
+    let total_width = props.columns.iter().fold(0, |acc, column| {
+        let config = column.get_config();
+        acc + config.width
+    });
     let columns = props.columns.iter().map(|column| {
         let config = column.get_config();
         let header_name = config.header_name;
@@ -28,25 +32,27 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         let row_values = props.columns.iter().enumerate().map(|(i,col)| {
             let value = col.get_value(row);
             let col_index_str = i.to_string();
-            let style = format!("width: 150px; height: 52px;");
+            let cell_width = col.get_config().width;
+            let style = format!("width: {cell_width}px; height: 52px;");
             html! {
                 <div class="yew-data-grid-cell" style={style} row-index={row_index_str.clone()} col-index={col_index_str}>
                     <div class="yew-data-grid-cell-content">{value}</div>
                 </div>
             }
         }).collect::<Html>();
-        let style = format!("height: 52px;");
+        let table_style = format!("width: {total_width}px; height: 52px;");
         html! (
-            <div class="yew-data-grid-row" style={style} row-index={row_index_str}>
+            <div class="yew-data-grid-row" style={table_style} row-index={row_index_str}>
                 {row_values}
             </div>
         )
     }).collect::<Html>();
+    let table_style = format!("width: {total_width}px; height: 52px;");
     html!(
         <div class="yew-data-grid-container">
             <style>{DATA_GRID_STYLE}</style>
             <h1>{ "data grid" }</h1>
-            <div class="yew-data-grid-header-row">
+            <div class="yew-data-grid-header-row" style={table_style}>
                 {columns}
             </div>
             {grid}

@@ -36,7 +36,7 @@
     background-color: rgba(0, 0, 0, 0.02);
 }
 
-.yew-data-grid-header-cell::before {
+.yew-data-grid-header-cell:nth-child(n+2)::before {
     position: relative;
     right: 10px;
     content: "";

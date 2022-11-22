@@ -1,4 +1,5 @@
 use yew::prelude::*;
+use yew::Callback;
 use yew_data_grid::data_grid::{GridData, GridDataColumn, DataGrid, GridDataColumnProps};
 
 // row data type
@@ -60,16 +61,51 @@ impl GridData for Task {
 // }
 #[function_component(App)]
 fn app() -> Html {
-    let rows: Vec<Task> = vec![Task{ id: 1, name: "task 1".to_string(), description: "task 1 description".to_string() },
-                               Task{ id: 2, name: "task b".to_string(), description: "task b description".to_string() }];
+    let rows = use_state(|| {
+        vec![
+            Task {
+                id: 1,
+                name: "Task 1".to_string(),
+                description: "Task 1 Description".to_string(),
+            },
+            Task {
+                id: 2,
+                name: "Task 2".to_string(),
+                description: "Task 2 Description".to_string(),
+            },
+            Task {
+                id: 3,
+                name: "Task 3".to_string(),
+                description: "Task 3 Description".to_string(),
+            },
+        ]
+    });
+    let onclick = {
+        let rows = rows.clone();
+        Callback::from(move |_| {
+            let mut new_rows = (*rows).clone();
+            for n in 0..500 {
+                new_rows.push(Task {
+                    id: n,
+                    name: format!("Task {}", n),
+                    description: format!("Task {} Description", n),
+                });
+            }
+            rows.set(new_rows);
+        })
+    };
     let columns: Vec<TaskFields> = vec![TaskFields::Id, TaskFields::Name, TaskFields::Description];
     let height = 400;
     let style = format!("width: 100%; height: {height}px;");
+    let rows = (*rows).clone();
     html! (
         // https://yew.rs/docs/next/concepts/basic-web-technologies/css#inline-styles
-        <div style={style}>
-            <DataGrid<Task, TaskFields> rows={rows} columns={columns} page_size={5}/>
-        </div>
+        <>
+            <button {onclick}>{ "Add 500" }</button>
+            <div style={style}>
+                <DataGrid<Task, TaskFields> rows={rows} columns={columns} page_size={5}/>
+            </div>
+        </>
     )
 }
 

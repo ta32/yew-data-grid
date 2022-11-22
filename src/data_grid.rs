@@ -14,12 +14,13 @@ const DATA_GRID_STYLE: &'static str = include_str!("data_grid.rs.css");
 pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                  U: GridDataColumn<RowType=T> + PartialEq + Copy>
                 (props: &Props<T, U>) -> Html {
+    // TODO conditional compilation of this effect
     let start = use_state(|| InstantWeb::now());
     {
         let start = start.clone();
         use_effect(move || {
             let elapsed = start.elapsed().as_millis();
-            log::info!("DataGrid rendered in {}ms", elapsed);
+            log::info!("data-grid rendered in {elapsed}ms");
             || {}
         });
     }
@@ -30,6 +31,12 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         }
         row_indexes
     });
+
+    // TODO this design will not work when sorting is implemented the parent component will need to pass ids to track rows between prop updates and sorting
+    if props.rows.len() != row_indexes.len() {
+        row_indexes.set(props.rows.iter().enumerate().map(|(i, _)| i).collect());
+    }
+
     let total_width = props.columns.iter().fold(0, |acc, column| {
         let config = column.get_config();
         acc + config.width

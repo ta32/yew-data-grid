@@ -4,7 +4,7 @@ use yew_data_grid::data_grid::{GridData, GridDataColumn, DataGrid, GridDataColum
 // row data type
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 struct Task {
-    pub id: u32,
+    pub id: usize,
     pub name: String,
     pub description: String,
 }
@@ -18,13 +18,6 @@ enum TaskFields {
 // TODO - create derive macro for this
 impl GridDataColumn for TaskFields {
     type RowType = Task;
-    fn get_value(&self, row: &Task) -> String {
-        match self {
-            TaskFields::Id => row.id.to_string(),
-            TaskFields::Name => row.name.to_string(),
-            TaskFields::Description => row.description.to_string(),
-        }
-    }
     fn get_config(&self) -> GridDataColumnProps {
         match self {
             TaskFields::Id => GridDataColumnProps {
@@ -47,11 +40,20 @@ impl GridDataColumn for TaskFields {
             },
         }
     }
+    fn get_value(&self, row: &Task) -> String {
+        match self {
+            TaskFields::Id => row.id.to_string(),
+            TaskFields::Name => row.name.to_string(),
+            TaskFields::Description => row.description.to_string(),
+        }
+    }
 }
+
 // TODO - create derive macro for this
 impl GridData for Task {
     type ColumnType = TaskFields;
 }
+
 // wont compile be cause we are using associated type in trait
 // impl GridData for Task {
 // type ColumnType = TaskFields2;
@@ -72,6 +74,7 @@ fn app() -> Html {
 }
 
 fn main() {
+    wasm_logger::init(wasm_logger::Config::new(log::Level::Trace));
     yew::start_app::<App>();
 }
 

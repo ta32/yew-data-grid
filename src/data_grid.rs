@@ -1,3 +1,4 @@
+use instant::Instant as InstantWeb;
 use yew::prelude::*;
 
 #[derive(Properties, Clone, PartialEq)]
@@ -13,10 +14,27 @@ const DATA_GRID_STYLE: &'static str = include_str!("data_grid.rs.css");
 pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                  U: GridDataColumn<RowType=T> + PartialEq + Copy>
                 (props: &Props<T, U>) -> Html {
+    let start = use_state(|| InstantWeb::now());
+    {
+        let start = start.clone();
+        use_effect(move || {
+            let elapsed = start.elapsed().as_millis();
+            log::info!("DataGrid rendered in {}ms", elapsed);
+            || {}
+        });
+    }
+    let row_indexes = use_state(|| {
+        let mut row_indexes = Vec::new();
+        for i in 0..props.rows.len() {
+            row_indexes.push(i);
+        }
+        row_indexes
+    });
     let total_width = props.columns.iter().fold(0, |acc, column| {
         let config = column.get_config();
         acc + config.width
     });
+
     let columns = props.columns.iter().map(|column| {
         let config = column.get_config();
         let header_name = config.header_name;
@@ -26,27 +44,31 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
             <div class="yew-data-grid-header-cell" style={style}>{header_name}</div>
         }
     }).collect::<Html>();
-    let grid = props.rows.iter().enumerate().map(|(i, row)| {
-        let row_index_str = i.to_string();
-        // row elements
-        let row_values = props.columns.iter().enumerate().map(|(i,col)| {
-            let value = col.get_value(row);
-            let col_index_str = i.to_string();
-            let cell_width = col.get_config().width;
-            let style = format!("width: {cell_width}px; height: 52px;");
-            html! {
+    let grid = {
+        let row_indexes = row_indexes.clone();
+        row_indexes.iter().map(|i| {
+            let row_index_str = i.to_string();
+            let row = &props.rows[*i];
+            // row elements
+            let row_values = props.columns.iter().enumerate().map(|(i,col)| {
+                let value = col.get_value(row);
+                let col_index_str = i.to_string();
+                let cell_width = col.get_config().width;
+                let style = format!("width: {cell_width}px; height: 52px;");
+                html! {
                 <div class="yew-data-grid-cell" style={style} row-index={row_index_str.clone()} col-index={col_index_str}>
                     <div class="yew-data-grid-cell-content">{value}</div>
                 </div>
             }
-        }).collect::<Html>();
-        let table_style = format!("width: {total_width}px; height: 52px;");
-        html! (
+            }).collect::<Html>();
+            let table_style = format!("width: {total_width}px; height: 52px;");
+            html! (
             <div class="yew-data-grid-row" style={table_style} row-index={row_index_str}>
                 {row_values}
             </div>
         )
-    }).collect::<Html>();
+        }).collect::<Html>()
+    };
     let table_style = format!("width: {total_width}px; height: 52px;");
     html!(
         <div class="yew-data-grid-container">
@@ -84,6 +106,7 @@ pub trait GridData {
         field.get_value(&self)
     }
 }
+
 
 #[cfg(test)]
 mod tests {

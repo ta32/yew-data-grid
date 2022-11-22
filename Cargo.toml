@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 yew = "0.19.3"
+log = "0.4"
+instant = { version = "0.1", features = ["wasm-bindgen"] }

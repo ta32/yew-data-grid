@@ -52,7 +52,11 @@ impl GridDataColumn for TaskFields {
 
 // TODO - create derive macro for this
 impl GridData for Task {
+    type IdType = usize;
     type ColumnType = TaskFields;
+    fn get_id(&self) -> String {
+        self.id.to_string()
+    }
 }
 
 // wont compile be cause we are using associated type in trait

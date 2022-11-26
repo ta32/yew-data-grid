@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use instant::Instant as InstantWeb;
 use yew::prelude::*;
 
@@ -24,23 +25,48 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
             || {}
         });
     }
-    let row_indexes = use_state(|| {
-        let mut row_indexes = Vec::new();
-        for i in 0..props.rows.len() {
-            row_indexes.push(i);
+
+    let row_index_map = use_state(|| {
+        let mut row_index_map = HashMap::new();
+        for (i, v) in props.rows.iter().enumerate() {
+            row_index_map.insert(v.get_id(), i);
         }
-        row_indexes
+        row_index_map
     });
 
-    // TODO this design will not work when sorting is implemented the parent component will need to pass ids to track rows between prop updates and sorting
-    if props.rows.len() != row_indexes.len() {
-        row_indexes.set(props.rows.iter().enumerate().map(|(i, _)| i).collect());
+    let sort_order = use_state(|| {
+        let mut sort_order = Vec::new();
+        for row in props.rows.iter() {
+            sort_order.push(row.get_id());
+        }
+        sort_order
+    });
+
+    let new_rows = props.rows.iter().filter(|r| !row_index_map.contains_key(&r.get_id())).collect::<Vec<&T>>();
+    if new_rows.len() > 0 {
+        log::info!("adding new {} rows", new_rows.len());
+        let mut new_sort_order = (*sort_order).clone();
+        for row in new_rows.iter() {
+            new_sort_order.push(row.get_id());
+        }
+
+        let last_index = row_index_map.len();
+        let new_row_indexes: HashMap<String, usize> = new_rows.iter().enumerate().map(|(i, r)| (r.get_id(), i + last_index)).collect();
+        let mut current_row_indexes = (*row_index_map).clone();
+        current_row_indexes.extend(new_row_indexes);
+
+        row_index_map.set(current_row_indexes);
+        sort_order.set(new_sort_order);
     }
 
     let total_width = props.columns.iter().fold(0, |acc, column| {
         let config = column.get_config();
         acc + config.width
     });
+
+    log::info!("sort_order len {}", sort_order.len());
+    log::info!("prop.rows len {}", props.rows.len());
+    log::info!("row_index_map len {}", row_index_map.len());
 
     let columns = props.columns.iter().map(|column| {
         let config = column.get_config();
@@ -52,11 +78,10 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         }
     }).collect::<Html>();
     let grid = {
-        let row_indexes = row_indexes.clone();
-        row_indexes.iter().map(|i| {
+        sort_order.iter().map(|i| {
             let row_index_str = i.to_string();
-            let row = &props.rows[*i];
-            // row elements
+            let row = &props.rows[(*row_index_map)[&row_index_str]];
+            // row column values
             let row_values = props.columns.iter().enumerate().map(|(i,col)| {
                 let value = col.get_value(row);
                 let col_index_str = i.to_string();
@@ -68,9 +93,10 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                 </div>
             }
             }).collect::<Html>();
+            let key = row.get_id();
             let table_style = format!("width: {total_width}px; height: 52px;");
             html! (
-            <div class="yew-data-grid-row" style={table_style} row-index={row_index_str}>
+            <div class="yew-data-grid-row" key={key.to_string()} style={table_style} row-index={row_index_str}>
                 {row_values}
             </div>
         )
@@ -108,10 +134,12 @@ pub trait GridDataColumn {
 }
 
 pub trait GridData {
+    type IdType: Sized + Clone;
     type ColumnType: GridDataColumn<RowType=Self>;
     fn get_value(&self, field: Self::ColumnType) -> String {
         field.get_value(&self)
     }
+    fn get_id(&self) -> String;
 }
 
 

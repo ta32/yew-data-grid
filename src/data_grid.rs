@@ -9,11 +9,6 @@ pub struct Props<T: GridData<ColumnType=U> + PartialEq, U: GridDataColumn<RowTyp
     pub page_size: usize
 }
 
-pub struct RowState {
-    pub row_index_map: HashMap<String, usize>,
-    pub sort_order: Vec<String>
-}
-
 const DATA_GRID_STYLE: &'static str = include_str!("data_grid.rs.css");
 
 #[function_component(DataGrid)]
@@ -31,39 +26,47 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         || {}
     });
 
-    let row_state = use_state(|| {
+    let row_index_map = use_state(|| {
         let mut row_index_map = HashMap::new();
-        let mut sort_order = Vec::new();
-        for (i, row) in props.rows.iter().enumerate() {
-            row_index_map.insert(row.get_id(), i);
-            sort_order.push(row.get_id());
+        for (i, v) in props.rows.iter().enumerate() {
+            row_index_map.insert(v.get_id(), i);
         }
-        RowState { row_index_map, sort_order }
+        row_index_map
     });
 
-    if props.rows.len() != row_state.sort_order.len() {
-        let new_rows = props.rows.iter().filter(|r| !row_state.row_index_map.contains_key(&r.get_id())).collect::<Vec<&T>>();
-        log::info!("new_rows {}", new_rows.len());
-        if row_state.sort_order.len() + new_rows.len() != props.rows.len() {
-            log::error!("duplicate keys in rows detected cannot render data grid");
-        } else {
-            log::info!("adding new {} rows", new_rows.len());
-            let mut new_sort_order = (*row_state).sort_order.clone();
-            for row in new_rows.iter() {
-                new_sort_order.push(row.get_id());
-            }
-            let last_index = row_state.row_index_map.len();
-            let new_row_indexes: HashMap<String, usize> = new_rows.iter().enumerate().map(|(i, r)| (r.get_id(), i + last_index)).collect();
-            let mut current_row_indexes = (*row_state).row_index_map.clone();
-            current_row_indexes.extend(new_row_indexes);
-            row_state.set(RowState { row_index_map: current_row_indexes, sort_order: new_sort_order });
+    let sort_order = use_state(|| {
+        let mut sort_order = Vec::new();
+        for row in props.rows.iter() {
+            sort_order.push(row.get_id());
         }
+        sort_order
+    });
+
+    let new_rows = props.rows.iter().filter(|r| !row_index_map.contains_key(&r.get_id())).collect::<Vec<&T>>();
+    if new_rows.len() > 0 {
+        log::info!("adding new {} rows", new_rows.len());
+        let mut new_sort_order = (*sort_order).clone();
+        for row in new_rows.iter() {
+            new_sort_order.push(row.get_id());
+        }
+
+        let last_index = row_index_map.len();
+        let new_row_indexes: HashMap<String, usize> = new_rows.iter().enumerate().map(|(i, r)| (r.get_id(), i + last_index)).collect();
+        let mut current_row_indexes = (*row_index_map).clone();
+        current_row_indexes.extend(new_row_indexes);
+
+        row_index_map.set(current_row_indexes);
+        sort_order.set(new_sort_order);
     }
 
     let total_width = props.columns.iter().fold(0, |acc, column| {
         let config = column.get_config();
         acc + config.width
     });
+
+    log::info!("sort_order len {}", sort_order.len());
+    log::info!("prop.rows len {}", props.rows.len());
+    log::info!("row_index_map len {}", row_index_map.len());
 
     let columns = props.columns.iter().map(|column| {
         let config = column.get_config();
@@ -75,9 +78,9 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         }
     }).collect::<Html>();
     let grid = {
-        row_state.sort_order.iter().map(|i| {
+        sort_order.iter().map(|i| {
             let row_index_str = i.to_string();
-            let row = &props.rows[(*row_state).row_index_map[&row_index_str]];
+            let row = &props.rows[(*row_index_map)[&row_index_str]];
             // row column values
             let row_values = props.columns.iter().enumerate().map(|(i,col)| {
                 let value = col.get_value(row);

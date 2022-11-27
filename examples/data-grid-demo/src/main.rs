@@ -65,6 +65,7 @@ impl GridData for Task {
 // }
 #[function_component(App)]
 fn app() -> Html {
+    let last_id = use_state(|| 3);
     let rows = use_state(|| {
         vec![
             Task {
@@ -88,13 +89,15 @@ fn app() -> Html {
         let rows = rows.clone();
         Callback::from(move |_| {
             let mut new_rows = (*rows).clone();
-            for n in 0..500 {
+            for n in 1..501 {
+                let id = *last_id + n;
                 new_rows.push(Task {
-                    id: n,
-                    name: format!("Task {}", n),
-                    description: format!("Task {} Description", n),
+                    id,
+                    name: format!("Task {}", id),
+                    description: format!("Task {} Description", id),
                 });
             }
+            last_id.set(*last_id + 500);
             rows.set(new_rows);
         })
     };

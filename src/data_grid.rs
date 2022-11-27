@@ -43,18 +43,21 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         RowState { row_index_map, sort_order }
     });
 
-    let new_rows = props.rows.iter().filter(|r| !row_state.borrow().row_index_map.contains_key(&r.get_id())).collect::<Vec<&T>>();
-    if new_rows.len() > 0 {
-        log::info!("adding new {} rows", new_rows.len());
-        let mut new_sort_order = row_state.borrow().sort_order.clone();
-        for row in new_rows.iter() {
-            new_sort_order.push(row.get_id());
+    if props.rows.len() != row_state.borrow().sort_order.len() {
+        let new_rows = props.rows.iter().filter(|r| !row_state.borrow().row_index_map.contains_key(&r.get_id())).collect::<Vec<&T>>();
+        if row_state.borrow().sort_order.len() + new_rows.len() != props.rows.len() {
+            log::error!("duplicate keys in rows detected cannot render data grid");
+        } else {
+            let mut new_sort_order = row_state.borrow().sort_order.clone();
+            for row in new_rows.iter() {
+                new_sort_order.push(row.get_id());
+            }
+            let last_index = row_state.borrow().row_index_map.len();
+            let new_row_indexes: HashMap<String, usize> = new_rows.iter().enumerate().map(|(i, r)| (r.get_id(), i + last_index)).collect();
+            let mut current_row_indexes = row_state.borrow().row_index_map.clone();
+            current_row_indexes.extend(new_row_indexes);
+            row_state.replace(RowState { row_index_map: current_row_indexes, sort_order: new_sort_order });
         }
-        let last_index = row_state.borrow().row_index_map.len();
-        let new_row_indexes: HashMap<String, usize> = new_rows.iter().enumerate().map(|(i, r)| (r.get_id(), i + last_index)).collect();
-        let mut current_row_indexes = row_state.borrow().row_index_map.clone();
-        current_row_indexes.extend(new_row_indexes);
-        row_state.replace(RowState { row_index_map: current_row_indexes, sort_order: new_sort_order });
     }
 
     let total_width = props.columns.iter().fold(0, |acc, column| {

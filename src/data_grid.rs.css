@@ -36,6 +36,7 @@
     background-color: rgba(0, 0, 0, 0.02);
 }
 
+/* header separator: create pseudo element - every child except the first */
 .yew-data-grid-header-cell:nth-child(n+2)::before {
     position: relative;
     right: 10px;
@@ -43,4 +44,11 @@
     width: 1px;
     height: 1.5em;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.yew-data-grid-scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    flex-grow: 1;
 }

@@ -101,13 +101,14 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
     };
     let table_style = format!("width: {total_width}px; height: 52px;");
     html!(
-        <div class="yew-data-grid-container">
-            <style>{DATA_GRID_STYLE}</style>
-            <h1>{ "data grid" }</h1>
-            <div class="yew-data-grid-header-row" style={table_style}>
-                {columns}
+        <div class="yew-data-grid-scrollable">
+             <div class="yew-data-grid-container">
+                <style>{DATA_GRID_STYLE}</style>
+                <div class="yew-data-grid-header-row" style={table_style}>
+                    {columns}
+                </div>
+                {grid}
             </div>
-            {grid}
         </div>
     )
 }

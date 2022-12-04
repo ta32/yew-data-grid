@@ -91,21 +91,31 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
             }
             }).collect::<Html>();
             let key = row.get_id();
-            let table_style = format!("width: {total_width}px; height: 52px;");
+            let table_style = format!("width: 100%; height: 52px;");
+            let empty_row_value = html! {
+                <div class="yew-data-grid-cell" style="width: 100%; display: flex" row-index={row_index_str.clone()} col-index="0">
+                    <div class="yew-data-grid-cell-content"></div>
+                </div>
+            };
             html! (
             <div class="yew-data-grid-row" key={key.to_string()} style={table_style} row-index={row_index_str}>
                 {row_values}
+                {empty_row_value}
             </div>
         )
         }).collect::<Html>()
     };
-    let table_style = format!("width: {total_width}px; height: 52px;");
+    let table_style = format!("width: 100%; height: 52px;");
+    let empty_header = html! {
+        <div class="yew-data-grid-header-cell" style="width: 100%; display: flex"></div>
+    };
     html!(
         <div class="yew-data-grid-scrollable">
              <div class="yew-data-grid-container">
                 <style>{DATA_GRID_STYLE}</style>
                 <div class="yew-data-grid-header-row" style={table_style}>
                     {columns}
+                    {empty_header}
                 </div>
                 {grid}
             </div>

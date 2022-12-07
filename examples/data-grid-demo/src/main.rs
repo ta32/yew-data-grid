@@ -89,7 +89,7 @@ fn app() -> Html {
         let rows = rows.clone();
         Callback::from(move |_| {
             let mut new_rows = (*rows).clone();
-            for n in 1..501 {
+            for n in 1..11 {
                 let id = *last_id + n;
                 new_rows.push(Task {
                     id,
@@ -97,7 +97,7 @@ fn app() -> Html {
                     description: format!("Task {} Description", id),
                 });
             }
-            last_id.set(*last_id + 500);
+            last_id.set(*last_id + 10);
             rows.set(new_rows);
         })
     };
@@ -108,7 +108,7 @@ fn app() -> Html {
     html! (
         // https://yew.rs/docs/next/concepts/basic-web-technologies/css#inline-styles
         <>
-            <button {onclick}>{ "Add 500" }</button>
+            <button {onclick}>{ "Add 10" }</button>
             <div style={style}>
                 <DataGrid<Task, TaskFields> rows={rows} columns={columns} page_size={5}/>
             </div>

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use instant::{Instant as InstantWeb};
+use crate::grid_pagination_bar::{GridPaginationBar, GridPaginationBarProps};
 use yew::prelude::*;
 
 const DATA_GRID_STYLE: &'static str = include_str!("data_grid.rs.css");
@@ -13,7 +14,7 @@ pub struct RowState {
 pub struct Props<T: GridData<ColumnType=U> + PartialEq, U: GridDataColumn<RowType=T> + PartialEq + Copy> {
     pub rows: Vec<T>,
     pub columns: Vec<U>,
-    pub page_size: usize
+    pub page_size: i32
 }
 
 #[function_component(DataGrid)]
@@ -110,6 +111,10 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
     let empty_header = html! {
         <div class="yew-data-grid-header-cell" style="width: 100%; display: flex"></div>
     };
+
+    let rows_total = row_state.borrow().sort_order.len();
+
+
     html!(
          <div class="yew-data-grid-container">
             <style>{DATA_GRID_STYLE}</style>
@@ -119,6 +124,9 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
             </div>
             <div class="yew-data-grid-scrollable">
                 {grid}
+            </div>
+            <div class="yew-data-grid-footer-container">
+                <GridPaginationBar props={GridPaginationBarProps{ page: 1, page_size: 100, total_rows: rows_total}}/>
             </div>
         </div>
     )

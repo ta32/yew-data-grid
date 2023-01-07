@@ -61,3 +61,21 @@
     height: 52px;
     border-top: 1px solid rgba(225, 225, 225, 1);
 }
+
+.yew-grid-pagination-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.01);
+    padding: 0 16px;
+}
+
+.yew-grid-pagination-bar-control-button {
+    margin: 3px;
+    width: 32px;
+    height: 32px;
+    border-radius: 20%;
+    background-color: rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+}

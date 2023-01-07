@@ -20,10 +20,8 @@ pub fn grid_pagination_bar(i: &Props) -> Html {
         <div class="yew-grid-pagination-bar">
             <div class="yew-grid-pagination-bar-summary">{summary}</div>
             <div class="yew-grid-pagination-bar-controls">
-                <button class="yew-grid-pagination-bar-control-button">{"<<"}</button>
                 <button class="yew-grid-pagination-bar-control-button">{"<"}</button>
                 <button class="yew-grid-pagination-bar-control-button">{">"}</button>
-                <button class="yew-grid-pagination-bar-control-button">{">>"}</button>
             </div>
         </div>
     }

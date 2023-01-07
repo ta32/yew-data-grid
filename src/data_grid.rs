@@ -84,7 +84,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                 let value = col.get_value(row);
                 let col_index_str = i.to_string();
                 let cell_width = col.get_config().width;
-                let style = format!("width: {cell_width}px; height: {CELL_HEIGHT}px;");
+                let style = format!("width: {cell_width}px; min-height: {CELL_HEIGHT}px;");
                 html! {
                 <div class="yew-data-grid-cell" style={style} row-index={row_index_str.clone()} col-index={col_index_str}>
                     <div class="yew-data-grid-cell-content">{value}</div>
@@ -92,13 +92,13 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
             }
             }).collect::<Html>();
             let key = row.get_id();
-            let style = format!("width: 100%; height: {CELL_HEIGHT}px; display: flex");
+            let style = format!("width: 100%; min-height: {CELL_HEIGHT}px; display: flex");
             let empty_cell = html! {
                 <div class="yew-data-grid-cell" style={style} row-index={row_index_str.clone()} col-index="0">
                     <div class="yew-data-grid-cell-content"></div>
                 </div>
             };
-            let row_style = format!("width: 100%; height: {CELL_HEIGHT}px;");
+            let row_style = format!("width: 100%; min-height: {CELL_HEIGHT}px;");
             html! (
             <div class="yew-data-grid-row" key={key.to_string()} style={row_style} row-index={row_index_str}>
                 {cell_values}
@@ -107,7 +107,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         )
         }).collect::<Html>()
     };
-    let table_style = format!("width: 100%; height: 52px;");
+    let table_style = format!("width: 100%; min-height: 52px;");
     let empty_header = html! {
         <div class="yew-data-grid-header-cell" style="width: 100%; display: flex"></div>
     };

@@ -6,6 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https:car//doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-yew = "0.19.3"
+yew = "0.20.0"
 log = "0.4"
 instant = { version = "0.1", features = ["wasm-bindgen"] }

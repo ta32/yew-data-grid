@@ -3,6 +3,7 @@ use yew::prelude::*;
 #[derive(Clone, PartialEq)]
 pub struct GridPaginationBarProps {
     pub page: i32,
+    pub number_pages: i32,
     pub page_size: i32,
     pub total_rows: usize
 }
@@ -25,7 +26,7 @@ pub fn grid_pagination_bar(i: &Props) -> Html {
                 <button class="yew-grid-pagination-bar-control-button">{"1"}</button>
                 <button class="yew-grid-pagination-bar-control-button">{">"}</button>
             </div>
-            <div class="yew-grid-pagination-bar-summary">{summary}</div>
+            <span class="yew-grid-pagination-bar-summary">{summary}</span>
         </div>
     }
 }

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use instant::{Instant as InstantWeb};
+use crate::hooks::pagination::{Pagination, use_page_view};
 use crate::grid_pagination_bar::{GridPaginationBar, GridPaginationBarProps};
 use yew::prelude::*;
 
@@ -75,10 +76,14 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
             <div class="yew-data-grid-header-cell" style={style}>{header_name}</div>
         }
     }).collect::<Html>();
+
+    log::info!("row_len: {}",props.rows.len());
+    let pagination = Pagination::new(props.rows.len(), props.page_size);
+    let page_view = use_page_view(pagination, &row_state.borrow().sort_order);
     let grid = {
-        row_state.borrow().sort_order.iter().map(|i| {
-            let row_index_str = i.to_string();
-            let row = &props.rows[row_state.borrow().row_index_map[&row_index_str]];
+        page_view.iter().map(|i| {
+            let row_key = i.to_string();
+            let row = &props.rows[row_state.borrow().row_index_map[&row_key]];
             const CELL_HEIGHT: i32 = 52;
             let cell_values = props.columns.iter().enumerate().map(|(i,col)| {
                 let value = col.get_value(row);
@@ -86,7 +91,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                 let cell_width = col.get_config().width;
                 let style = format!("width: {cell_width}px; min-height: {CELL_HEIGHT}px;");
                 html! {
-                <div class="yew-data-grid-cell" style={style} row-index={row_index_str.clone()} col-index={col_index_str}>
+                <div class="yew-data-grid-cell" style={style} row-index={row_key.clone()} col-index={col_index_str}>
                     <div class="yew-data-grid-cell-content">{value}</div>
                 </div>
             }
@@ -94,13 +99,13 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
             let key = row.get_id();
             let style = format!("width: 100%; min-height: {CELL_HEIGHT}px; display: flex");
             let empty_cell = html! {
-                <div class="yew-data-grid-cell" style={style} row-index={row_index_str.clone()} col-index="0">
+                <div class="yew-data-grid-cell" style={style} row-index={row_key.clone()} col-index="0">
                     <div class="yew-data-grid-cell-content"></div>
                 </div>
             };
             let row_style = format!("width: 100%; min-height: {CELL_HEIGHT}px;");
             html! (
-            <div class="yew-data-grid-row" key={key.to_string()} style={row_style} row-index={row_index_str}>
+            <div class="yew-data-grid-row" key={key.to_string()} style={row_style} row-index={row_key}>
                 {cell_values}
                 {empty_cell}
             </div>
@@ -126,7 +131,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                 {grid}
             </div>
             <div class="yew-data-grid-footer-container">
-                <GridPaginationBar props={GridPaginationBarProps{ page: 1, page_size: 100, total_rows: rows_total}}/>
+                <GridPaginationBar props={GridPaginationBarProps{ page: 1, page_size: 100, total_rows: rows_total, number_pages: 10}}/>
             </div>
         </div>
     )

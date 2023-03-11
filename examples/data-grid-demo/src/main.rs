@@ -2,6 +2,8 @@ use yew::prelude::*;
 use yew::Callback;
 use yew_data_grid::data_grid::{GridData, GridDataColumn, DataGrid, GridDataColumnProps};
 
+const ADD_NUM: usize = 1000;
+
 // row data type
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 struct Task {
@@ -89,7 +91,7 @@ fn app() -> Html {
         let rows = rows.clone();
         Callback::from(move |_| {
             let mut new_rows = (*rows).clone();
-            for n in 1..11 {
+            for n in 1..(ADD_NUM+1) {
                 let id = *last_id + n;
                 new_rows.push(Task {
                     id,
@@ -97,7 +99,7 @@ fn app() -> Html {
                     description: format!("Task {} Description", id),
                 });
             }
-            last_id.set(*last_id + 10);
+            last_id.set(*last_id + ADD_NUM);
             rows.set(new_rows);
         })
     };
@@ -105,10 +107,11 @@ fn app() -> Html {
     let height = 400;
     let style = format!("width: 100%; height: {height}px;");
     let rows = (*rows).clone();
+    let add_msg = format!("Add {} rows", ADD_NUM);
     html! (
         // https://yew.rs/docs/next/concepts/basic-web-technologies/css#inline-styles
         <>
-            <button {onclick}>{ "Add 10" }</button>
+            <button {onclick}>{ add_msg }</button>
             <div style={style}>
                 <DataGrid<Task, TaskFields> rows={rows} columns={columns} page_size={5}/>
             </div>

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use instant::{Instant as InstantWeb};
 use crate::hooks::pagination::{Pagination, use_page_view};
-use crate::grid_pagination_bar::{GridPaginationBar, GridPaginationBarProps};
+use crate::grid_pagination_bar::{GridPaginationBar};
 use yew::prelude::*;
 
 const DATA_GRID_STYLE: &'static str = include_str!("data_grid.rs.css");
@@ -24,6 +24,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                 (props: &Props<T, U>) -> Html {
     // TODO conditional compilation of this effect
     let _force_update = use_state(|| InstantWeb::now());
+    let pg = use_state(|| Pagination::new(props.rows.len(), props.page_size));
 
     let start = use_mut_ref(|| InstantWeb::now());
     start.replace(InstantWeb::now());
@@ -59,6 +60,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
             let mut current_row_indexes = row_state.borrow().row_index_map.clone();
             current_row_indexes.extend(new_row_indexes);
             row_state.replace(RowState { row_index_map: current_row_indexes, sort_order: new_sort_order });
+            pg.set(Pagination::new(props.rows.len(), props.page_size));
         }
     }
 
@@ -78,9 +80,8 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
     }).collect::<Html>();
 
     log::info!("row_len: {}",props.rows.len());
-    let pagination = Pagination::new(props.rows.len(), props.page_size);
-    let page_view = use_page_view(pagination, &row_state.borrow().sort_order);
     let grid = {
+        let page_view = use_page_view(*pg, &row_state.borrow().sort_order);
         page_view.iter().map(|i| {
             let row_key = i.to_string();
             let row = &props.rows[row_state.borrow().row_index_map[&row_key]];
@@ -117,9 +118,6 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         <div class="yew-data-grid-header-cell" style="width: 100%; display: flex"></div>
     };
 
-    let rows_total = row_state.borrow().sort_order.len();
-
-
     html!(
          <div class="yew-data-grid-container">
             <style>{DATA_GRID_STYLE}</style>
@@ -131,7 +129,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                 {grid}
             </div>
             <div class="yew-data-grid-footer-container">
-                <GridPaginationBar props={GridPaginationBarProps{ page: 1, page_size: 100, total_rows: rows_total, number_pages: 10}}/>
+                <GridPaginationBar pagination={{pg}}/>
             </div>
         </div>
     )

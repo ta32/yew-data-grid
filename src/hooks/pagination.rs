@@ -25,7 +25,7 @@ impl Pagination {
 pub fn use_page_view(p: Pagination, data_indexes: &Vec<String>) -> Rc<Vec<String>> {
     log::info!("use_page_view hook");
     log::info!("p: {p:?}");
-    let slice = use_memo(|p| get_page_view(&p, data_indexes), p);
+    let slice = use_memo(|p| get_page_view(p, data_indexes), p);
     slice
 }
 

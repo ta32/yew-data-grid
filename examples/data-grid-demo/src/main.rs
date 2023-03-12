@@ -113,7 +113,7 @@ fn app() -> Html {
         <>
             <button {onclick}>{ add_msg }</button>
             <div style={style}>
-                <DataGrid<Task, TaskFields> rows={rows} columns={columns} page_size={5}/>
+                <DataGrid<Task, TaskFields> rows={rows} columns={columns} page_size={200}/>
             </div>
         </>
     )

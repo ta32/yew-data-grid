@@ -81,6 +81,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
 
     log::info!("row_len: {}",props.rows.len());
     let grid = {
+        // let page_view = &row_state.borrow().sort_order;
         let page_view = use_page_view(*pg, &row_state.borrow().sort_order);
         page_view.iter().map(|i| {
             let row_key = i.to_string();
@@ -129,7 +130,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                 {grid}
             </div>
             <div class="yew-data-grid-footer-container">
-                <GridPaginationBar pagination={{pg}}/>
+               <GridPaginationBar pagination={{pg}}/>
             </div>
         </div>
     )

@@ -71,11 +71,22 @@
     padding: 0 16px;
 }
 
+/* solid otherwise it wil be darker on one side https://stackoverflow.com/questions/70237675/half-of-the-input-border-is-darker */
 .yew-grid-pagination-bar-control-button {
     margin: 3px;
     width: 32px;
     height: 32px;
     border-radius: 20%;
+    border: thin solid;
     background-color: rgba(0, 0, 0, 0.02);
     cursor: pointer;
+}
+
+.yew-grid-pagination-bar-control-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.yew-grid-pagination-bar-control-button-selected {
+    border-color: #1677ff;
+    color: #1677ff;
 }

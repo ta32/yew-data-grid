@@ -47,8 +47,14 @@ pub fn grid_pagination_bar(props: &Props) -> Html {
         let num_pages = props.pagination.number_pages;
         (1..num_pages).map(|i| {
             let page = i.to_string();
-            html! {
-                <button class="yew-grid-pagination-bar-control-button">{page}</button>
+            return if i == props.pagination.page {
+                html! {
+                    <button class="yew-grid-pagination-bar-control-button yew-grid-pagination-bar-control-button-selected">{page}</button>
+                }
+            } else {
+                html! {
+                    <button class="yew-grid-pagination-bar-control-button">{page}</button>
+                }
             }
         }).collect::<Html>()
     };

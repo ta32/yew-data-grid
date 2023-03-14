@@ -23,14 +23,11 @@ impl Pagination {
 
 #[hook]
 pub fn use_page_view(p: Pagination, data_indexes: &Vec<String>) -> Rc<Vec<String>> {
-    log::info!("use_page_view hook");
-    log::info!("p: {p:?}");
     let slice = use_memo(|p| get_page_view(p, data_indexes), p);
     slice
 }
 
 fn get_page_view(p: &Pagination, data_indexes: &Vec<String>) -> Vec<String> {
-    log::info!("get_page_view");
     let start = (p.page - 1) * p.page_size;
     let end = start + p.page_size;
     log::info!("start: {start} end: {end}");

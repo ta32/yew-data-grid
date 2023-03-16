@@ -14,7 +14,6 @@ pub fn grid_pagination_bar(props: &Props) -> Html {
     const BAR_HEIGHT: i32 = 48;
     let style = format!("min-height: {BAR_HEIGHT}px; display: flex; flex-direction: row;");
 
-    // TODO extract this logic to reduce the duplication
     let inc_page = {
         let state = props.pagination.clone();
         Callback::from(move |_| {
@@ -43,17 +42,34 @@ pub fn grid_pagination_bar(props: &Props) -> Html {
         })
     };
 
+    let jump_page = {
+        let state = props.pagination.clone();
+        Callback::from(move |page_num| {
+            let mut new_state = Pagination::new(state.total_rows, state.page_size);
+            let new_page_num = if page_num < 1 {
+                1
+            } else if page_num > state.number_pages {
+                state.number_pages
+            } else {
+                page_num
+            };
+            new_state.page = new_page_num;
+            state.set(new_state);
+        })
+    };
+
     let page_buttons = {
         let num_pages = props.pagination.number_pages;
-        (1..num_pages).map(|i| {
+        (1..num_pages+1).map(|i| {
             let page = i.to_string();
+            let jump_page = jump_page.clone();
             return if i == props.pagination.page {
                 html! {
                     <button class="yew-grid-pagination-bar-control-button yew-grid-pagination-bar-control-button-selected">{page}</button>
                 }
             } else {
                 html! {
-                    <button class="yew-grid-pagination-bar-control-button">{page}</button>
+                    <button onclick={ move|_| {jump_page.emit(i)}} class="yew-grid-pagination-bar-control-button">{page}</button>
                 }
             }
         }).collect::<Html>()

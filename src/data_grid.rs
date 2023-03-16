@@ -79,7 +79,6 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
         }
     }).collect::<Html>();
 
-    log::info!("row_len: {}",props.rows.len());
     let grid = {
         // let page_view = &row_state.borrow().sort_order;
         let page_view = use_page_view(*pg, &row_state.borrow().sort_order);

@@ -30,7 +30,6 @@ pub fn use_page_view(p: Pagination, data_indexes: &Vec<String>) -> Rc<Vec<String
 fn get_page_view(p: &Pagination, data_indexes: &Vec<String>) -> Vec<String> {
     let start = (p.page - 1) * p.page_size;
     let end = start + p.page_size;
-    log::info!("start: {start} end: {end}");
     return if end >= data_indexes.len() as i32 {
         data_indexes[start as usize..].to_vec()
     } else {

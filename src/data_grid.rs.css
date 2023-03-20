@@ -71,7 +71,7 @@
     padding: 0 16px;
 }
 
-/* solid otherwise it wil be darker on one side https://stackoverflow.com/questions/70237675/half-of-the-input-border-is-darker */
+/* border solid otherwise it wil be darker on one side https://stackoverflow.com/questions/70237675/half-of-the-input-border-is-darker */
 .yew-grid-pagination-bar-control-button {
     margin: 3px;
     width: 32px;

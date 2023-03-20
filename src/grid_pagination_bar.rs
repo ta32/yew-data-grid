@@ -1,9 +1,26 @@
 use yew::prelude::*;
 use crate::hooks::pagination::Pagination;
 
+#[derive(Clone, Copy, PartialEq, Debug)]
+enum PageRange {
+    Lower,
+    Mid,
+    Upper
+}
+
+fn get_page_range(i: i32, num_pages: i32, max_num_pages: i32) -> PageRange {
+    if i < max_num_pages {
+        PageRange::Lower
+    } else if i > num_pages - max_num_pages {
+        PageRange::Upper
+    } else {
+        PageRange::Mid
+    }
+}
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct Props {
+    pub max_pages_to_show: i32,
     pub pagination: UseStateHandle<Pagination>
 }
 
@@ -59,20 +76,18 @@ pub fn grid_pagination_bar(props: &Props) -> Html {
     };
 
     let page_buttons = {
-        let num_pages = props.pagination.number_pages;
-        (1..num_pages+1).map(|i| {
-            let page = i.to_string();
-            let jump_page = jump_page.clone();
-            return if i == props.pagination.page {
-                html! {
-                    <button class="yew-grid-pagination-bar-control-button yew-grid-pagination-bar-control-button-selected">{page}</button>
-                }
-            } else {
-                html! {
-                    <button onclick={ move|_| {jump_page.emit(i)}} class="yew-grid-pagination-bar-control-button">{page}</button>
-                }
+        if props.pagination.number_pages <= props.max_pages_to_show {
+            pages_view_uncapped(props, jump_page)
+        } else {
+            let page_range = get_page_range(props.pagination.page,
+                                            props.pagination.number_pages,
+                                            props.max_pages_to_show);
+            match page_range {
+                PageRange::Lower => pages_in_lower_range_view(props, jump_page),
+                PageRange::Mid => pages_fit_in_limit_view(props, jump_page),
+                PageRange::Upper => pages_fit_in_limit_view(props, jump_page)
             }
-        }).collect::<Html>()
+        }
     };
     html! {
         <div class="yew-grid-pagination-bar" style={style}>
@@ -83,5 +98,84 @@ pub fn grid_pagination_bar(props: &Props) -> Html {
             </div>
             <span class="yew-grid-pagination-bar-summary">{summary}</span>
         </div>
+    }
+}
+
+fn pages_view_uncapped(props: &Props, jump_page: Callback<i32>) -> Html {
+    let num_pages = props.pagination.number_pages;
+    (1..num_pages+1).map(|i| {
+        let page = i.to_string();
+        let jump_page = jump_page.clone();
+        return if i == props.pagination.page {
+            html! {
+                <button class="yew-grid-pagination-bar-control-button yew-grid-pagination-bar-control-button-selected">{page}</button>
+            }
+        } else {
+            html! {
+                <button onclick={ move|_| {jump_page.emit(i)}} class="yew-grid-pagination-bar-control-button">{page}</button>
+            }
+        }
+    }).collect::<Html>()
+}
+
+fn pages_in_lower_range_view(props: &Props, jump_page: Callback<i32>) -> Html {
+    let max_pages_to_show = props.max_pages_to_show;
+    // show ellipses at second last page
+    (1..max_pages_to_show + 1).map(|i| {
+        let page = i.to_string();
+        let jump_page = jump_page.clone();
+        if i == max_pages_to_show - 1 {
+            html! {
+                <button class="yew-grid-pagination-bar-control-button yew-grid-pagination-bar-control-button-ellipsis">{"..."}</button>
+            }
+        } else if i == props.pagination.page {
+            html! {
+                <button class="yew-grid-pagination-bar-control-button yew-grid-pagination-bar-control-button-selected">{page}</button>
+            }
+        } else {
+            html! {
+                <button onclick={ move|_| {jump_page.emit(i)}} class="yew-grid-pagination-bar-control-button">{page}</button>
+            }
+        }
+    }).collect::<Html>()
+}
+
+fn pages_fit_in_limit_view(props: &Props, jump_page: Callback<i32>) -> Html {
+    let num_pages = props.pagination.number_pages;
+    (1..num_pages+1).map(|i| {
+        let page = i.to_string();
+        let jump_page = jump_page.clone();
+        return if i == props.pagination.page {
+            html! {
+                <button class="yew-grid-pagination-bar-control-button yew-grid-pagination-bar-control-button-selected">{page}</button>
+            }
+        } else {
+            html! {
+                <button onclick={ move|_| {jump_page.emit(i)}} class="yew-grid-pagination-bar-control-button">{page}</button>
+            }
+        }
+    }).collect::<Html>()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_page_range() {
+        let max_num_pages = 10;
+        let num_pages = 100;
+        // lower range of pages is 1 to 10
+        // ellipses shown at second last page
+        let page_range = get_page_range(1, num_pages, max_num_pages);
+        assert_eq!(page_range, PageRange::Lower);
+
+        // midrange of pages is 11 to 90
+        // ellipses shown at second page and second last page
+        let page_range = get_page_range(11, num_pages, max_num_pages);
+
+        // end range of pages is 91 to 100
+        // ellipses shown at second page
+        let page_range = get_page_range(91, num_pages, max_num_pages);
     }
 }

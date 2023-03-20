@@ -129,7 +129,7 @@ pub fn data_grid<T: GridData<ColumnType=U> + PartialEq,
                 {grid}
             </div>
             <div class="yew-data-grid-footer-container">
-               <GridPaginationBar pagination={{pg}}/>
+               <GridPaginationBar pagination={pg} max_pages_to_show=10/>
             </div>
         </div>
     )
